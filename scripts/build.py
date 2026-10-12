@@ -2,8 +2,8 @@
 """수집 결과를 사이트용 data/site.json 으로 합친다(개요·주별 표가 읽음).
 
 - AAA: 최신일 51곳 4종 + 그날의 비교값(어제·1주·1달·1년 전) + 주별 일일 이력(수집 시작일부터)
-- 경합 표시: us_elections 공개 저장소의 Cook Political Report 상원·주지사 등급(빌드 때 직접 읽음)
-  경합 = Toss-up 또는 Lean(양당). 등급 원문과 기준일을 그대로 싣는다.
+- 경합 표시: fetch_ratings.py가 270toWin에서 받은 Cook Political Report 상원·주지사 등급(data/ratings.json)
+  경합 = Toss-up 또는 Lean(양당). as_of = Cook 기준일, posted_at = 270toWin 게시 시각, fetched_at = 수집 시각.
 - EIA: 장기 추세 페이지는 data/eia_weekly.json 을 직접 읽으므로 여기서는 최신 주 요약만.
 """
 from __future__ import annotations
@@ -12,14 +12,11 @@ import csv
 import json
 import os
 import sys
-import urllib.request
 from collections import defaultdict
 from datetime import datetime, timezone
 
 ROOT = os.path.join(os.path.dirname(__file__), "..")
 D = lambda *p: os.path.join(ROOT, "data", *p)  # noqa: E731
-RATINGS_BASE = "https://raw.githubusercontent.com/us-elections-2026/us-elections-2026.github.io/main/data/"
-RATING_FILES = {"senate": "senate_ratings_feed.json", "governor": "governor_ratings.json"}
 COMPETITIVE = {"Toss-up", "Lean D", "Lean R"}
 FUELS = ["regular", "mid_grade", "premium", "diesel"]
 NAMES = {
@@ -47,19 +44,12 @@ def read_csv(path: str) -> list[dict]:
 
 
 def ratings() -> dict:
-    out = {}
-    for race, fn in RATING_FILES.items():
-        try:
-            with urllib.request.urlopen(RATINGS_BASE + fn, timeout=60) as r:
-                feed = json.load(r)
-        except Exception as e:  # noqa: BLE001
-            print(f"[warn] 등급 {fn} 읽기 실패: {e} — 경합 표시 없이 빌드", file=sys.stderr)
-            continue
-        cook = next((s for s in feed["sources"] if s["key"].startswith("cook-political-report")), None)
-        if cook:
-            out[race] = {"label": cook["label"], "as_of": cook["as_of"], "ratings": cook["ratings"],
-                         "via": RATINGS_BASE + fn}
-    return out
+    path = D("ratings.json")
+    if not os.path.exists(path):
+        print("[warn] data/ratings.json 없음 — 경합 표시 없이 빌드", file=sys.stderr)
+        return {}
+    feed = json.load(open(path, encoding="utf-8"))
+    return {race: {"label": feed["label"], "fetched_at": feed["fetched_at"], **r} for race, r in feed["races"].items()}
 
 
 def main() -> int:
@@ -88,8 +78,8 @@ def main() -> int:
         races = []
         for race, src in rt.items():
             lab = src["ratings"].get(st)
-            if lab:
-                races.append({"race": race, "rating": lab, "competitive": lab in COMPETITIVE})
+            for one in (lab if isinstance(lab, list) else [lab] if lab else []):
+                races.append({"race": race, "rating": one, "competitive": one in COMPETITIVE})
         states.append({"code": st, "name": NAMES.get(st, st), "price": {f: num(r[f]) for f in FUELS},
                        "refs": refs.get(st, {}), "races": races,
                        "competitive": any(x["competitive"] for x in races)})
@@ -103,7 +93,7 @@ def main() -> int:
 
     site = {"built_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%MZ"), "aaa_date": latest,
             "aaa_first_date": min(r["date"] for r in daily), "states": states, "history": history,
-            "ratings_meta": {k: {x: v[x] for x in ("label", "as_of", "via")} for k, v in rt.items()},
+            "ratings_meta": {k: {x: v[x] for x in ("label", "as_of", "posted_at", "detail_url", "fetched_at")} for k, v in rt.items()},
             "eia_latest": eia_latest, "eia_fetched_at": eia["fetched_at"]}
     with open(D("site.json"), "w", encoding="utf-8") as f:
         json.dump(site, f, ensure_ascii=False, separators=(",", ":"))

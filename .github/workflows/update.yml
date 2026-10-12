@@ -24,6 +24,9 @@ jobs:
       - name: AAA 일일 + 비교값
         if: github.event_name != 'push'
         run: python scripts/fetch_aaa.py --refs
+      - name: Cook 등급 (270toWin)
+        if: github.event_name != 'push'
+        run: python scripts/fetch_ratings.py
       - name: EIA 주간 (전체 재다운로드)
         if: github.event_name != 'push'
         run: python scripts/fetch_eia.py

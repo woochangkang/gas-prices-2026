@@ -24,12 +24,18 @@
     return ref && ref[fuel] != null && s.price[fuel] != null ? s.price[fuel] - ref[fuel] : null;
   };
 
+  const rm = site.ratings_meta;
+  const ratingDates = () => Object.keys(rm).length
+    ? Object.entries(rm).map(([k, v]) => `<a href="${v.detail_url}">${RACE[k]}</a> <b>${v.as_of}</b> 기준`).join(" · ") +
+      " (270toWin 게재본)"
+    : "등급을 불러오지 못함";
   // 머리띠·KPI
   const e = site.eia_latest;
   const reg = S.filter((s) => s.price.regular != null).sort((a, b) => b.price.regular - a.price.regular);
   document.getElementById("dateline").innerHTML =
     `AAA 주별 평균 <b>${kdate(site.aaa_date)}</b> 기준 · EIA 전국 주간 <b>${kdate(e.gasoline.week)}</b> 주 · ` +
-    `2026년 중간선거(11월 3일)까지 <b>${daysTo(ELECTION)}일</b>`;
+    `2026년 중간선거(11월 3일)까지 <b>${daysTo(ELECTION)}일</b><br>` +
+    `경합 표시 기준: Cook Political Report ${ratingDates()}`;
   const kpi = (lab, val, sub) => `<div class="kpi"><div class="lab">${lab}</div><div class="val">${val}</div><div class="sub">${sub}</div></div>`;
   document.getElementById("kpis").innerHTML = [
     kpi("전국 일반 휘발유 (EIA 주간)", usd(e.gasoline.us, 3), `전주 대비 ${delta(e.gasoline.us - e.gasoline.week_ago)} · 1년 전 대비 ${delta(e.gasoline.us - e.gasoline.year_ago)}`),
@@ -41,8 +47,11 @@
     "EIA 전국값은 매주 월요일 조사 가격이고, 1년 전 = 52주 전입니다. AAA 주별 값은 매일 아침 한 번 기록한 값이라 두 출처의 수준이 조금 다를 수 있습니다.";
 
   // 지도
-  let fuel = "regular";
+  let fuel = "regular", metric = "price";
   const BINS = 7;
+  // 지도 값: 현재가 또는 1년 변화(현재 − AAA 「1년 전」 평균)
+  const mapVal = (s) => (metric === "price" ? s.price[fuel] : chg(s, fuel, "year_ago"));
+  const fmtVal = (v) => (metric === "price" ? v.toFixed(2) : (v >= 0 ? "+" : "−") + Math.abs(v).toFixed(2));
   const tilemap = document.getElementById("tilemap");
   const tiles = {};
   Object.entries(GRID).forEach(([code, [r, c]]) => {
@@ -70,26 +79,35 @@
     return Array.from({ length: BINS - 1 }, (_, i) => v[Math.floor(((i + 1) * v.length) / BINS)]);
   }
   function drawMap() {
-    const vals = S.map((s) => s.price[fuel]).filter((v) => v != null);
-    const br = quantileBreaks(vals);
+    const vals = S.map(mapVal).filter((v) => v != null);
+    // 1년 변화에서 하락한 주가 있으면, 하락은 순차 색 단계에 섞지 않고 회색으로 따로 칠한다
+    const neg = metric === "change" && vals.some((v) => v < 0);
+    const posVals = neg ? vals.filter((v) => v >= 0) : vals;
+    const br = quantileBreaks(posVals.length ? posVals : vals);
     const compOnly = document.getElementById("comp-only").checked;
     Object.entries(tiles).forEach(([code, el]) => {
       const s = byCode[code];
-      const v = s && s.price[fuel];
-      if (v == null) { el.dataset.b = "na"; el.style.background = ""; el.querySelector(".pr").textContent = "—"; return; }
-      const b = br.filter((x) => v >= x).length;
-      el.dataset.b = b;
-      el.style.background = `var(--s${b + 1})`;
-      el.querySelector(".pr").textContent = v.toFixed(2);
-      el.setAttribute("aria-label", `${s.name} ${FUEL_LABEL[fuel]} ${usd(v)}${s.competitive ? ", 경합" : ""}`);
+      const v = s && mapVal(s);
+      if (v == null || (neg && v < 0)) {
+        el.dataset.b = "na"; el.style.background = "";
+        el.querySelector(".pr").textContent = v == null ? "—" : fmtVal(v);
+      } else {
+        const b = br.filter((x) => v >= x).length;
+        el.dataset.b = b;
+        el.style.background = `var(--s${b + 1})`;
+        el.querySelector(".pr").textContent = fmtVal(v);
+      }
+      if (s) el.setAttribute("aria-label", `${s.name} ${FUEL_LABEL[fuel]} ${metric === "price" ? "" : "1년 변화 "}${v == null ? "없음" : fmtVal(v)}달러${s.competitive ? ", 경합" : ""}`);
       el.classList.toggle("dim", compOnly && !s.competitive);
     });
-    const lo = Math.min(...vals), hi = Math.max(...vals);
+    const lo = Math.min(...posVals), hi = Math.max(...posVals);
     const edges = [lo, ...br, hi];
+    const title = metric === "price" ? `${FUEL_LABEL[fuel]} 현재가 (달러/갤런)` : `${FUEL_LABEL[fuel]} 1년 전 대비 변화 (달러/갤런)`;
     document.getElementById("legend").innerHTML =
-      `<span>${FUEL_LABEL[fuel]} 달러/갤런</span><span class="ramp">${Array.from({ length: BINS }, (_, i) =>
-        `<span style="background:var(--s${i + 1})" title="${edges[i].toFixed(2)}–${edges[i + 1].toFixed(2)}"></span>`).join("")}</span>` +
-      `<span class="mono">${lo.toFixed(2)} → ${hi.toFixed(2)}</span><span class="small">(51곳을 7단계로 같은 수씩 나눔)</span>` +
+      `<span>${title}</span><span class="ramp">${Array.from({ length: BINS }, (_, i) =>
+        `<span style="background:var(--s${i + 1})" title="${fmtVal(edges[i])} ~ ${fmtVal(edges[i + 1])}"></span>`).join("")}</span>` +
+      `<span class="mono">${fmtVal(lo)} → ${fmtVal(hi)}</span><span class="small">(${posVals.length}곳을 7단계로 같은 수씩 나눔)</span>` +
+      (neg ? `<span><span class="ramp"><span style="background:var(--grid)"></span></span> 하락 ${vals.length - posVals.length}곳</span>` : "") +
       `<span><span class="ringkey"></span> 2026 경합(상원·주지사, Cook)</span>`;
   }
   document.querySelectorAll("#fuel-seg button").forEach((b) => b.addEventListener("click", () => {
@@ -97,8 +115,14 @@
     document.querySelectorAll("#fuel-seg button").forEach((x) => x.setAttribute("aria-pressed", x === b));
     drawMap();
   }));
+  document.querySelectorAll("#metric-seg button").forEach((b) => b.addEventListener("click", () => {
+    metric = b.dataset.m;
+    document.querySelectorAll("#metric-seg button").forEach((x) => x.setAttribute("aria-pressed", x === b));
+    drawMap();
+  }));
   document.getElementById("comp-only").addEventListener("change", drawMap);
   drawMap();
+  document.getElementById("map-rdate").innerHTML = ratingDates();
 
   // 표
   const COLS = [
@@ -133,10 +157,9 @@
   document.getElementById("table-comp-only").addEventListener("change", drawTable);
   drawTable();
   const nRefs = S.filter((s) => Object.keys(s.refs).length).length;
-  const rm = site.ratings_meta;
   document.getElementById("tbl-note").innerHTML =
     `1주·1년 변화는 AAA 주별 페이지의 「1주 전」「1년 전」 평균과 비교한 값입니다(${nRefs}/51곳 수집). ` +
-    `등급: ${Object.entries(rm).map(([k, v]) => `${RACE[k]} ${v.label} ${v.as_of}`).join(" · ") || "불러오지 못함"}.`;
+    `등급: ${Object.entries(rm).map(([k, v]) => `${RACE[k]} ${v.label} ${v.as_of} 기준(<a href="${v.detail_url}">270toWin 게재본</a>, 270toWin 게시 ${v.posted_at.slice(0, 10)}, 이 사이트 수집 ${v.fetched_at.slice(0, 10)})`).join(" · ") || "불러오지 못함"}.`;
   document.getElementById("foot").innerHTML =
-    `자료: <a href="https://gasprices.aaa.com/state-gas-price-averages/">AAA Gas Prices</a> · <a href="https://www.eia.gov/petroleum/gasdiesel/">EIA Gasoline and Diesel Fuel Update</a> · 등급은 <a href="https://us-elections-2026.github.io/">2026 미국 중간선거 전망</a> 수집본. 빌드 ${site.built_at}.`;
+    `자료: <a href="https://gasprices.aaa.com/state-gas-price-averages/">AAA Gas Prices</a> · <a href="https://www.eia.gov/petroleum/gasdiesel/">EIA Gasoline and Diesel Fuel Update</a> · 등급은 <a href="https://www.270towin.com/2026-senate-election/cook-political-report-2026-senate">270toWin 게재 Cook Political Report</a>(상원)·<a href="https://www.270towin.com/2026-governor-election/cook-political-report-2026-governor">(주지사)</a>. 빌드 ${site.built_at}.`;
 })();

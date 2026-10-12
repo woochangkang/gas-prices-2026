@@ -30,11 +30,15 @@
       <button data-f="mid_grade" aria-pressed="false">중급</button>
       <button data-f="premium" aria-pressed="false">고급</button>
     </div>
+    <div class="seg" id="metric-seg" role="group" aria-label="지도 값">
+      <button data-m="price" aria-pressed="true">현재가</button>
+      <button data-m="change" aria-pressed="false">1년 변화</button>
+    </div>
     <label class="chk"><input type="checkbox" id="comp-only"> 경합주만 보기</label>
   </div>
   <div class="tilemap" id="tilemap" aria-label="주별 가격 타일 지도"></div>
   <div class="legend" id="legend"></div>
-  <p class="note">타일 하나가 주 하나입니다(실제 면적과 무관). 테두리 친 주는 Cook Political Report가 2026년 상원 또는 주지사 선거를 Toss-up·Lean으로 평가한 곳입니다. 타일에 마우스를 올리면 연료 4종과 1주·1달·1년 전 값이 나옵니다.</p>
+  <p class="note">타일 하나가 주 하나입니다(실제 면적과 무관). 테두리 친 주는 Cook Political Report가 2026년 상원 또는 주지사 선거를 Toss-up·Lean으로 평가한 곳입니다(<span id="map-rdate"></span>). 「1년 변화」는 현재가에서 AAA 주별 페이지의 「1년 전」 평균을 뺀 값입니다. 타일에 마우스를 올리면 연료 4종과 1주·1년 변화가 나옵니다.</p>
 
   <h2>주별 표</h2>
   <div class="controls"><label class="chk"><input type="checkbox" id="table-comp-only"> 경합주만</label>
