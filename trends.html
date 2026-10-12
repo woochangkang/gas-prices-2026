@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>유가 추세</title>
+<meta name="description" content="EIA 주간 휘발유·디젤 장기 추세(1990~), 지역 비교, AAA 주별 일일 추이">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;600&family=JetBrains+Mono:wght@400;600&family=Noto+Serif+KR:wght@600;700&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="brand" href="./">미국 유가 트래커</a>
+  <nav><a href="./">개요</a><a href="trends.html" aria-current="page">추세</a><a href="about.html">출처·방법</a></nav>
+</div></header>
+
+<main class="wrap">
+  <h1>유가 추세</h1>
+  <p class="dateline" id="dateline">불러오는 중…</p>
+
+  <h2>전국 휘발유와 디젤 (EIA 주간)</h2>
+  <div class="controls">
+    <div class="seg" id="range1" role="group" aria-label="기간">
+      <button data-y="1" aria-pressed="false">1년</button>
+      <button data-y="5" aria-pressed="true">5년</button>
+      <button data-y="10" aria-pressed="false">10년</button>
+      <button data-y="0" aria-pressed="false">전체</button>
+    </div>
+    <label class="chk"><input type="checkbox" id="elec1" checked> 선거일 표시</label>
+  </div>
+  <div class="chartbox"><div class="cv"><canvas id="c1" aria-label="전국 휘발유·디젤 주간 가격 추이"></canvas></div></div>
+  <p class="note">일반 휘발유 = Regular, All Formulations. 디젤 = No 2 Diesel. 둘 다 매주 월요일 조사 소매가(세금 포함, 달러/갤런). 점선은 11월 총선거일입니다.</p>
+
+  <h2>지역 비교 (EIA 주간)</h2>
+  <div class="controls">
+    <div class="seg" id="prod2" role="group" aria-label="연료">
+      <button data-p="gasoline" aria-pressed="true">일반 휘발유</button>
+      <button data-p="diesel" aria-pressed="false">디젤</button>
+    </div>
+    <div class="seg" id="range2" role="group" aria-label="기간">
+      <button data-y="1" aria-pressed="false">1년</button>
+      <button data-y="5" aria-pressed="true">5년</button>
+      <button data-y="0" aria-pressed="false">전체</button>
+    </div>
+  </div>
+  <div class="controls" id="areas2" aria-label="지역 선택 (최대 4곳)"></div>
+  <div class="chartbox"><div class="cv"><canvas id="c2" aria-label="지역별 주간 가격 비교"></canvas></div></div>
+  <p class="note" id="note2"></p>
+
+  <h2>주별 일일 추이 (AAA)</h2>
+  <div class="controls">
+    <select id="st3" aria-label="주 선택"></select>
+    <span class="small muted">점 = AAA 주별 페이지가 알려 준 1년·1달·1주 전 평균</span>
+  </div>
+  <div class="chartbox"><div class="cv"><canvas id="c3" aria-label="선택한 주의 일일 가격"></canvas></div></div>
+  <p class="note" id="note3"></p>
+</main>
+
+<footer><div class="wrap">자료: <a href="https://www.eia.gov/petroleum/gasdiesel/">EIA Gasoline and Diesel Fuel Update</a> · <a href="https://gasprices.aaa.com/state-gas-price-averages/">AAA Gas Prices</a>. 자세한 정의는 <a href="about.html">출처·방법</a>.</div></footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="assets/common.js"></script>
+<script src="assets/trends.js"></script>
+</body>
+</html>

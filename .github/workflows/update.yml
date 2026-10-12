@@ -1,0 +1,48 @@
+name: update-and-publish
+on:
+  schedule:
+    - cron: "0 14 * * *"   # 매일 14:00 UTC = 23:00 KST = 10:00 ET (AAA 당일 값 반영 후)
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths-ignore: ["data/**"]
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+concurrency:
+  group: update
+  cancel-in-progress: false
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install pandas xlrd
+      - name: AAA 일일 + 비교값
+        if: github.event_name != 'push'
+        run: python scripts/fetch_aaa.py --refs
+      - name: EIA 주간 (전체 재다운로드)
+        if: github.event_name != 'push'
+        run: python scripts/fetch_eia.py
+      - run: python scripts/build.py
+      - name: 수집 결과 커밋
+        if: github.event_name != 'push'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
+          git add data
+          git diff --cached --quiet || git commit -m "data: $(date -u +%F) 자동 수집"
+          git push
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with: { path: "." }
+  deploy:
+    needs: update
+    runs-on: ubuntu-latest
+    environment: { name: github-pages, url: "${{ steps.d.outputs.page_url }}" }
+    steps:
+      - id: d
+        uses: actions/deploy-pages@v4

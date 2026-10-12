@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>미국 유가 트래커</title>
+<meta name="description" content="미국 50개 주와 워싱턴 D.C.의 휘발유·디젤 평균 가격 — AAA 일일·EIA 주간, 2026 중간선거 경합주 표시">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;600&family=JetBrains+Mono:wght@400;600&family=Noto+Serif+KR:wght@600;700&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="brand" href="./">미국 유가 트래커</a>
+  <nav><a href="./" aria-current="page">개요</a><a href="trends.html">추세</a><a href="about.html">출처·방법</a></nav>
+</div></header>
+
+<main class="wrap">
+  <h1>미국 휘발유·디젤 가격, 주별로 보기</h1>
+  <p class="dateline" id="dateline">불러오는 중…</p>
+
+  <div class="kpis" id="kpis"></div>
+  <p class="note" id="kpi-note"></p>
+
+  <h2>주별 평균 가격 지도</h2>
+  <div class="controls">
+    <div class="seg" id="fuel-seg" role="group" aria-label="연료">
+      <button data-f="regular" aria-pressed="true">일반 휘발유</button>
+      <button data-f="diesel" aria-pressed="false">디젤</button>
+      <button data-f="mid_grade" aria-pressed="false">중급</button>
+      <button data-f="premium" aria-pressed="false">고급</button>
+    </div>
+    <label class="chk"><input type="checkbox" id="comp-only"> 경합주만 보기</label>
+  </div>
+  <div class="tilemap" id="tilemap" aria-label="주별 가격 타일 지도"></div>
+  <div class="legend" id="legend"></div>
+  <p class="note">타일 하나가 주 하나입니다(실제 면적과 무관). 테두리 친 주는 Cook Political Report가 2026년 상원 또는 주지사 선거를 Toss-up·Lean으로 평가한 곳입니다. 타일에 마우스를 올리면 연료 4종과 1주·1달·1년 전 값이 나옵니다.</p>
+
+  <h2>주별 표</h2>
+  <div class="controls"><label class="chk"><input type="checkbox" id="table-comp-only"> 경합주만</label>
+    <span class="small muted">열 제목을 누르면 정렬합니다. 변화 = 현재 − 비교 시점(달러/갤런).</span></div>
+  <div class="tablewrap"><table class="data" id="tbl"></table></div>
+  <p class="note" id="tbl-note"></p>
+</main>
+
+<footer><div class="wrap" id="foot"></div></footer>
+<script src="assets/common.js"></script>
+<script src="assets/overview.js"></script>
+</body>
+</html>
