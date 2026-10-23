@@ -1,10 +1,10 @@
 {
- "fetched_at": "2026-10-22T18:27Z",
+ "fetched_at": "2026-10-23T18:14Z",
  "label": "Cook Political Report",
  "races": {
   "senate": {
-   "as_of": "2026-10-06",
-   "posted_at": "2026-10-12 14:22:13",
+   "as_of": "2026-10-20",
+   "posted_at": "2026-10-23 17:26:41",
    "detail_url": "https://www.270towin.com/2026-senate-election/cook-political-report-2026-senate",
    "page_url": "https://www.270towin.com/2026-senate-election/",
    "ratings": {
@@ -24,8 +24,8 @@
     "MA": "Solid D",
     "ME": "Toss-up",
     "MI": "Toss-up",
-    "MN": "Likely D",
-    "MS": "Solid R",
+    "MN": "Lean D",
+    "MS": "Likely R",
     "MT": "Solid R",
     "NC": "Likely D",
     "NE": "Likely R",
@@ -36,7 +36,7 @@
     "OK": "Solid R",
     "OR": "Solid D",
     "RI": "Solid D",
-    "SC": "Likely R",
+    "SC": "Lean R",
     "SD": "Solid R",
     "TN": "Solid R",
     "TX": "Toss-up",
