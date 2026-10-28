@@ -1,5 +1,5 @@
 {
- "fetched_at": "2026-10-27T19:22Z",
+ "fetched_at": "2026-10-28T19:29Z",
  "label": "Cook Political Report",
  "races": {
   "senate": {
@@ -46,8 +46,8 @@
    }
   },
   "governor": {
-   "as_of": "2026-10-13",
-   "posted_at": "2026-10-15 17:19:55",
+   "as_of": "2026-10-27",
+   "posted_at": "2026-10-28 14:41:19",
    "detail_url": "https://www.270towin.com/2026-governor-election/cook-political-report-2026-governor",
    "page_url": "https://www.270towin.com/2026-governor-election/",
    "ratings": {
@@ -64,18 +64,18 @@
     "IA": "Lean D",
     "ID": "Solid R",
     "IL": "Solid D",
-    "KS": "Lean R",
+    "KS": "Toss-up",
     "MA": "Solid D",
     "MD": "Solid D",
     "ME": "Solid D",
     "MI": "Lean D",
     "MN": "Solid D",
-    "NE": "Likely R",
+    "NE": "Lean R",
     "NH": "Likely R",
     "NM": "Solid D",
     "NV": "Toss-up",
     "NY": "Solid D",
-    "OH": "Toss-up",
+    "OH": "Lean D",
     "OK": "Likely R",
     "OR": "Lean D",
     "PA": "Solid D",
