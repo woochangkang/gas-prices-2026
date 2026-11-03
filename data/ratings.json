@@ -1,10 +1,10 @@
 {
- "fetched_at": "2026-11-02T22:44Z",
+ "fetched_at": "2026-11-03T20:35Z",
  "label": "Cook Political Report",
  "races": {
   "senate": {
-   "as_of": "2026-10-20",
-   "posted_at": "2026-10-23 17:26:41",
+   "as_of": "2026-11-02",
+   "posted_at": "2026-11-03 13:02:39",
    "detail_url": "https://www.270towin.com/2026-senate-election/cook-political-report-2026-senate",
    "page_url": "https://www.270towin.com/2026-senate-election/",
    "ratings": {
@@ -13,7 +13,7 @@
     "AR": "Solid R",
     "CO": "Solid D",
     "DE": "Solid D",
-    "FL": "Solid R",
+    "FL": "Likely R",
     "GA": "Likely D",
     "IA": "Toss-up",
     "ID": "Solid R",
@@ -23,12 +23,12 @@
     "LA": "Solid R",
     "MA": "Solid D",
     "ME": "Toss-up",
-    "MI": "Toss-up",
+    "MI": "Lean D",
     "MN": "Lean D",
     "MS": "Likely R",
     "MT": "Solid R",
     "NC": "Likely D",
-    "NE": "Likely R",
+    "NE": "Lean R",
     "NH": "Lean D",
     "NJ": "Solid D",
     "NM": "Solid D",
@@ -46,15 +46,15 @@
    }
   },
   "governor": {
-   "as_of": "2026-10-27",
-   "posted_at": "2026-10-28 14:41:19",
+   "as_of": "2026-11-02",
+   "posted_at": "2026-11-03 13:19:48",
    "detail_url": "https://www.270towin.com/2026-governor-election/cook-political-report-2026-governor",
    "page_url": "https://www.270towin.com/2026-governor-election/",
    "ratings": {
     "AK": "Lean D",
     "AL": "Solid R",
     "AR": "Solid R",
-    "AZ": "Lean D",
+    "AZ": "Likely D",
     "CA": "Solid D",
     "CO": "Solid D",
     "CT": "Solid D",
@@ -85,7 +85,7 @@
     "TN": "Solid R",
     "TX": "Lean R",
     "VT": "Likely R",
-    "WI": "Toss-up",
+    "WI": "Lean D",
     "WY": "Solid R"
    }
   }
